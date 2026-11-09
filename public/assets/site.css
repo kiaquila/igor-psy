@@ -140,7 +140,7 @@ img { display: block; width: 100%; }
 .button span { font-size: 18px; font-weight: 500; line-height: 1; }
 .booking-note { margin-top: 11px; color: var(--subtle); font-size: 12px; }
 .cover-image { position: relative; min-width: 0; background: var(--warm-gray); }
-.cover-image img { position: absolute; inset: 0; height: 100%; object-fit: cover; object-position: 50% 17%; filter: grayscale(1); }
+.cover-image img { position: absolute; inset: 0; height: 100%; object-fit: cover; object-position: 50% 17%; }
 
 .paper { background: var(--paper); --pad: clamp(28px, 5.2vw, 80px); }
 .detail-section {
