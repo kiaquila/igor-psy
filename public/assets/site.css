@@ -137,6 +137,7 @@ img { display: block; width: 100%; }
   text-decoration: none;
 }
 .button:hover { background: #454542; }
+.button:focus-visible { outline-color: var(--blue-ink); }
 .button span { font-size: 18px; font-weight: 500; line-height: 1; }
 .booking-note { margin-top: 11px; color: var(--subtle); font-size: 12px; }
 .cover-image { position: relative; min-width: 0; background: var(--warm-gray); }
