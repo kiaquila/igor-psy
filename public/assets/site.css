@@ -162,14 +162,13 @@ img { display: block; width: 100%; }
 .detail-section h1 span, .detail-section h2 span { color: var(--blue-ink); }
 .detail-section .section-label { margin-top: 8px; }
 .intro { border-top: 0; }
-.intro-copy, .body-copy, .small-copy {
+.intro-copy, .body-copy {
   max-width: 55ch;
   margin-top: 22px;
   font-size: 16px;
   line-height: 1.65;
 }
 .intro-copy { font-size: clamp(16px, 1.7vw, 20px); margin-top: 26px; }
-.small-copy { color: var(--subtle); font-size: 14px; }
 .section-nav {
   grid-column: 2;
   display: flex;
@@ -195,17 +194,10 @@ img { display: block; width: 100%; }
 .topic-list dt, .price-list dt { font-size: 17px; font-weight: 700; line-height: 1.35; }
 .topic-list dd { color: var(--subtle); font-size: 15px; line-height: 1.55; }
 
-.stats, .method-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(12px, 3vw, 42px);
-  margin-top: 32px;
-}
-.stats > div, .method-grid > div { padding-top: 14px; border-top: 1px solid var(--line); }
-.stats dt { color: var(--blue-ink); font-size: clamp(35px, 5.5vw, 68px); font-weight: 510; letter-spacing: -.07em; line-height: 1.16; }
-.stats dd, .method-grid p, .principle-list p { margin-top: 9px; line-height: 1.6; font-size: 15px; }
-.method-grid h3, .principle-list h3 { font-size: 19px; font-weight: 710; letter-spacing: -.035em; line-height: 1.25; }
-.method-grid p { color: var(--subtle); }
+.detail-subheading { margin-top: 30px; }
+.experience-list { margin: 12px 0 0; padding-inline-start: 1.25em; }
+.experience-list li + li { margin-top: 6px; }
+.detail-subheading, .principle-list h3 { font-size: 19px; font-weight: 710; letter-spacing: -.035em; line-height: 1.25; }
 
 .principles {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.26fr);
@@ -216,11 +208,11 @@ img { display: block; width: 100%; }
 .principles .section-label { color: inherit; margin-bottom: 18px; }
 .principle-list { display: grid; gap: 7px; }
 .principle-list > div { padding: 22px 26px; background: #f6f6f3; color: var(--ink); }
-.principle-list p { color: var(--subtle); }
+.principle-list p { margin-top: 9px; color: var(--subtle); line-height: 1.6; font-size: 15px; }
 
 .price-list > div { grid-template-columns: minmax(0, 1fr) auto; }
 .price-list small { display: block; margin-top: 6px; color: var(--subtle); font-size: 13px; font-weight: 500; line-height: 1.45; }
-.price-list dd { color: var(--blue-ink); font-size: clamp(16px, 2.3vw, 26px); font-weight: 680; letter-spacing: -.04em; }
+.price-list dd { color: var(--blue-ink); font-size: clamp(16px, 2.3vw, 26px); font-weight: 680; letter-spacing: -.04em; white-space: nowrap; }
 
 .faq-list { margin-top: 26px; border-top: 1px solid var(--line); }
 .faq-list details { border-bottom: 1px solid var(--line); }
@@ -249,7 +241,7 @@ img { display: block; width: 100%; }
 
 .contact { background: var(--warm-gray); }
 .contact .button { margin-top: 24px; }
-address { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 22px; color: var(--blue-ink); font-size: 14px; font-style: normal; font-weight: 650; }
+address { display: grid; gap: 8px; margin-top: 12px; color: var(--blue-ink); font-size: 14px; font-style: normal; font-weight: 650; line-height: 1.6; }
 
 @media (max-width: 760px) {
   .masthead { min-height: 63px; }
@@ -273,7 +265,6 @@ address { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 22px; color
   .foot nav { gap: 12px; }
   .wordmark { gap: 6px; font-size: 9px; letter-spacing: .055em; }
   .wordmark-mark { width: 17px; height: 17px; }
-  .topic-list > div, .method-grid { grid-template-columns: 1fr; }
-  .method-grid { gap: 18px; }
+  .topic-list > div { grid-template-columns: 1fr; }
   .principle-list > div { padding: 18px; }
 }
