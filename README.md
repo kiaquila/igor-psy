@@ -10,6 +10,14 @@ python3 -m http.server 8789 --bind 127.0.0.1 --directory public
 
 Откройте `http://127.0.0.1:8789/`.
 
+## Разработка
+
+```sh
+sh scripts/preflight.sh
+```
+
+Перед слиянием PR проверьте `Preflight` и `Codex Review` на GitHub. Порядок работы с агентами, запрос ревью для текущего коммита и настройка обязательных проверок описаны в [инструкции по разработке](docs/development.md).
+
 ## Cloudflare Workers
 
 `wrangler.json` настраивает раздачу статических файлов и домен `igor-psy.ks-design.art`. Для деплоя нужен доступ к аккаунту Cloudflare, в котором находится зона `ks-design.art`.

@@ -1,0 +1,8 @@
+name = "site_implementer"
+description = "Implement an assigned igor-psy change in its own files or worktree."
+developer_instructions = """
+Read AGENTS.md. Work only on the paths assigned by the coordinator. Keep the static site
+and Cloudflare routing contract intact. Run sh scripts/preflight.sh after your edits.
+Report the changed paths, commands, and any checks you could not run. Leave integration
+and GitHub actions to the coordinator.
+"""

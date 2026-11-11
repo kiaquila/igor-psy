@@ -1,0 +1,52 @@
+name: Codex review gate
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+  issue_comment:
+    types: [created, edited]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Open pull request to main
+        required: true
+        type: number
+
+permissions: {}
+
+jobs:
+  evaluate:
+    name: Evaluate Codex evidence
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name != 'issue_comment' ||
+        (github.event.issue.pull_request &&
+          (github.event.comment.user.login == 'chatgpt-codex-connector[bot]' ||
+            (github.event.comment.user.type == 'User' &&
+              contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association) &&
+              (startsWith(github.event.comment.body, '@codex review ') ||
+                github.event.comment.body == '/codex-check')))))
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      checks: write
+      contents: read
+      issues: read
+      pull-requests: read
+    concurrency:
+      group: codex-review-${{ github.event.pull_request.number || github.event.issue.number || inputs.pr_number }}
+    steps:
+      - name: Checkout trusted main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/heads/main
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+
+      - name: Evaluate and publish on PR head
+        run: node scripts/codex-review-gate.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
