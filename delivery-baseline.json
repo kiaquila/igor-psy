@@ -1,0 +1,74 @@
+{
+  "model": {
+    "downloadKbps": 1600,
+    "handshakeRtts": 3,
+    "rttMs": 150
+  },
+  "pages": {
+    "/": {
+      "firstPaint": {
+        "bytes": {
+          "assets/igor-portrait.webp": 125792,
+          "assets/manrope-cyrillic.woff2": 14544,
+          "assets/manrope-latin.woff2": 24576,
+          "assets/site.css": 2640,
+          "index.html": 1160
+        },
+        "ms": 1744
+      },
+      "fullLoad": {
+        "bytes": {
+          "assets/favicon.svg": 171,
+          "assets/igor-portrait.webp": 125792,
+          "assets/manrope-cyrillic.woff2": 14544,
+          "assets/manrope-latin.woff2": 24576,
+          "assets/site.css": 2640,
+          "index.html": 1160
+        },
+        "ms": 1744
+      }
+    },
+    "/404.html": {
+      "firstPaint": {
+        "bytes": {
+          "404.html": 863,
+          "assets/manrope-cyrillic.woff2": 14544,
+          "assets/manrope-latin.woff2": 24576,
+          "assets/site.css": 2640
+        },
+        "ms": 1113
+      },
+      "fullLoad": {
+        "bytes": {
+          "404.html": 863,
+          "assets/favicon.svg": 171,
+          "assets/manrope-cyrillic.woff2": 14544,
+          "assets/manrope-latin.woff2": 24576,
+          "assets/site.css": 2640
+        },
+        "ms": 1114
+      }
+    },
+    "/practice/": {
+      "firstPaint": {
+        "bytes": {
+          "assets/manrope-cyrillic.woff2": 14544,
+          "assets/manrope-latin.woff2": 24576,
+          "assets/site.css": 2640,
+          "practice/index.html": 3686
+        },
+        "ms": 1127
+      },
+      "fullLoad": {
+        "bytes": {
+          "assets/favicon.svg": 171,
+          "assets/manrope-cyrillic.woff2": 14544,
+          "assets/manrope-latin.woff2": 24576,
+          "assets/site.css": 2640,
+          "practice/index.html": 3686
+        },
+        "ms": 1128
+      }
+    }
+  }
+}
