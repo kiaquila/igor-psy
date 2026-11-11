@@ -1,0 +1,152 @@
+name: Production Deploy
+
+on:
+  workflow_run:
+    workflows: [Project CI]
+    branches: [main]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy igor-psy
+    if: >-
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    concurrency:
+      group: igor-psy-production
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      deployment: false
+    defaults:
+      run:
+        shell: bash
+    env:
+      PRODUCTION_URL: https://igor-psy.ks-design.art
+    steps:
+      - name: Select the current main revision with successful CI
+        id: revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # GitHub can replace a pending run in this concurrency group.
+          # Resolve main after entering the group so any trigger can deploy the latest eligible revision.
+          sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')"
+          conclusion="$(
+            gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs" --method GET \
+              -f branch=main -f event=push -f head_sha="$sha" -F per_page=1 \
+              --jq '.workflow_runs[0].conclusion // ""'
+          )"
+          if [[ "$conclusion" != success ]]; then
+            echo "No successful Project CI push run for main at $sha (conclusion: ${conclusion:-pending})."
+            printf 'Skipped deployment. Project CI for %s is %s.\n' "$sha" "${conclusion:-pending}" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout the validated revision
+        if: steps.revision.outputs.sha != ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.revision.outputs.sha }}
+          persist-credentials: false
+
+      - name: Set up Node.js
+        if: steps.revision.outputs.sha != ''
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Install Wrangler
+        if: steps.revision.outputs.sha != ''
+        run: npm ci --ignore-scripts
+
+      - name: Upload the Worker version
+        if: steps.revision.outputs.sha != ''
+        id: upload
+        env:
+          TARGET_SHA: ${{ steps.revision.outputs.sha }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          : "${CLOUDFLARE_ACCOUNT_ID:?Set the CLOUDFLARE_ACCOUNT_ID production variable}"
+          : "${CLOUDFLARE_API_TOKEN:?Set the CLOUDFLARE_API_TOKEN production secret}"
+          output="$(mktemp "$RUNNER_TEMP/wrangler-output.XXXXXX")"
+          trap 'rm -f "$output"' EXIT
+          WRANGLER_OUTPUT_FILE_PATH="$output" npm exec --no -- wrangler versions upload --message "Git commit $TARGET_SHA"
+          version_id="$(jq -ser 'map(select(.type == "version-upload")) | last | .version_id' "$output")"
+          if [[ ! "$version_id" =~ ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$ ]]; then
+            echo '::error::Wrangler returned an invalid Worker version ID.'
+            exit 1
+          fi
+          echo "version_id=$version_id" >> "$GITHUB_OUTPUT"
+
+      - name: Recheck the head of main before promotion
+        if: steps.upload.outputs.version_id != ''
+        id: current
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.revision.outputs.sha }}
+        run: |
+          sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')"
+          if [[ "$sha" != "$TARGET_SHA" ]]; then
+            printf 'Skipped promotion of %s. Main advanced to %s.\n' "$TARGET_SHA" "$sha" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo 'deploy=true' >> "$GITHUB_OUTPUT"
+
+      - name: Promote the uploaded Worker version
+        if: steps.current.outputs.deploy == 'true'
+        env:
+          TARGET_SHA: ${{ steps.revision.outputs.sha }}
+          VERSION_ID: ${{ steps.upload.outputs.version_id }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          # Version promotion leaves the existing custom domain and routes in place.
+          npm exec --no -- wrangler versions deploy "$VERSION_ID@100%" --yes --message "Git commit $TARGET_SHA"
+          printf 'Promoted Git commit %s as Cloudflare version %s at %s.\n' \
+            "$TARGET_SHA" "$VERSION_ID" "$PRODUCTION_URL" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify the production pages and assets
+        if: steps.current.outputs.deploy == 'true'
+        env:
+          TARGET_SHA: ${{ steps.revision.outputs.sha }}
+        run: |
+          verify() {
+            local route="$1" expected_status="$2" expected_file="$3" status attempt
+            local response="$RUNNER_TEMP/production-response"
+            for attempt in {1..6}; do
+              if status="$(curl --silent --show-error --max-time 15 \
+                  --header 'Cache-Control: no-cache' --output "$response" \
+                  --write-out '%{http_code}' \
+                  "$PRODUCTION_URL$route?deploy=$TARGET_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT-$attempt")" &&
+                [[ "$status" == "$expected_status" ]] && cmp -s "$response" "$expected_file"; then
+                printf 'Verified %s (%s) against %s\n' "$route" "$status" "$expected_file"
+                return
+              fi
+              if [[ "$attempt" -lt 6 ]]; then
+                sleep 5
+              fi
+            done
+            echo "::error::$route returned HTTP ${status:-unknown}. Expected $expected_status and the contents of $expected_file from $TARGET_SHA."
+            return 1
+          }
+
+          verify / 200 public/index.html
+          verify /practice/ 200 public/practice/index.html
+          verify /assets/site.css 200 public/assets/site.css
+          verify /assets/igor-portrait.webp 200 public/assets/igor-portrait.webp
+          verify "/missing-$TARGET_SHA" 404 public/404.html
+          echo 'Production smoke checks passed.' >> "$GITHUB_STEP_SUMMARY"
