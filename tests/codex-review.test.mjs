@@ -91,7 +91,10 @@ test("blocking findings survive a subsequent approval or receipt on the same hea
 });
 
 test("unresolved Codex threads block even with a clean review of a later commit", () => {
-  const thread = { isResolved: false, comments: { nodes: [{ author: { login: bot.login, __typename: "Bot" } }] } };
+  const author = { login: "chatgpt-codex-connector", __typename: "Bot" };
+  const thread = { isResolved: false, comments: { nodes: [{ author }] } };
   assert.equal(decide({ reviews: [approval], threads: [thread] }), "unresolved-thread");
   assert.equal(decide({ reviews: [approval], threads: [{ ...thread, isResolved: true }] }), "pass");
+  const humanThread = { ...thread, comments: { nodes: [{ author: { ...author, __typename: "User" } }] } };
+  assert.equal(decide({ reviews: [approval], threads: [humanThread] }), "pass");
 });

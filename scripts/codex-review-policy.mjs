@@ -1,6 +1,6 @@
 import { isStrictNativeCodexReceipt } from "./codex-native-receipt.mjs";
 
-export const CODEX_BOT = "chatgpt-codex-connector[bot]";
+const CODEX_BOT = "chatgpt-codex-connector";
 export const FULL_SHA = /^[a-f0-9]{40}$/;
 const maintainers = new Set(["OWNER", "MEMBER", "COLLABORATOR"]);
 
@@ -9,8 +9,9 @@ export function isMaintainer(comment) {
 }
 
 export function isCodex(user) {
-  // GraphQL returns a typed Bot; REST returns user.type.
-  return user?.login === CODEX_BOT && (user.type ?? user.__typename) === "Bot";
+  // GraphQL omits the [bot] suffix that GitHub adds to REST logins.
+  return (user?.type === "Bot" && user.login === `${CODEX_BOT}[bot]`) ||
+    (user?.__typename === "Bot" && user.login === CODEX_BOT);
 }
 
 export function requestedHead(comment) {
