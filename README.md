@@ -20,6 +20,8 @@ sh scripts/preflight.sh
 
 ## Cloudflare Workers
 
+GitHub Actions публикует `main` на `igor-psy.ks-design.art` после успешного `Preflight` для того же коммита. Результаты публикации и проверки сайта видны в [Production Deploy](https://github.com/kiaquila/igor-psy/actions/workflows/production-deploy.yml). Для деплоя используется окружение GitHub `production` с переменной `CLOUDFLARE_ACCOUNT_ID` и секретом `CLOUDFLARE_API_TOKEN` для Worker `igor-psy`.
+
 `wrangler.json` настраивает раздачу статических файлов и домен `igor-psy.ks-design.art`. Для деплоя нужен доступ к аккаунту Cloudflare, в котором находится зона `ks-design.art`.
 
 ```sh
