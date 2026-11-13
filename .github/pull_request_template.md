@@ -1,11 +1,11 @@
-## Изменение
+## Change
 
-<!-- Опишите, что изменится для посетителя сайта или для разработки. -->
+<!-- Describe what changes for site visitors or for development. -->
 
-## Проверки
+## Checks
 
-<!-- Укажите результат preflight. Для изменений интерфейса приложите скриншоты и результаты ручной проверки. -->
+<!-- Report the Preflight result. For interface changes, include screenshots and manual check results. -->
 
 ## Codex Review
 
-После последнего push запросите `@codex review <полный SHA>` отдельным комментарием и дождитесь зелёной проверки `Codex Review`.
+After the final push, post `@codex review <full SHA>` as a standalone comment and wait for the `Codex Review` check to pass.
