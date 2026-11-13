@@ -1,6 +1,6 @@
 # Landing Page for Psychologist Igor Cherkasov
 
-A single-page website for Igor Cherkasov’s private psychology practice. The Forest and Yellow palette pairs deep green with warm yellow accents on a light background.
+A single-page website for Igor Cherkasov’s private psychology practice. The Sage palette pairs muted green with pale green accents on a white background.
 
 ## Local preview
 
