@@ -1,6 +1,19 @@
 (function () {
   var top = document.querySelector('.top');
-  var menu = document.getElementById('menu');
+  var menu = top.querySelector('.menu');
+
+  menu.addEventListener('focusin', function (event) {
+    if (menu.scrollWidth <= menu.clientWidth) return;
+
+    var link = event.target.getBoundingClientRect();
+    var viewport = menu.getBoundingClientRect();
+    var left = link.left - viewport.left - 8;
+    var right = link.right - viewport.right + 8;
+    if (left < 0) menu.scrollLeft += left;
+    else if (right > 0) menu.scrollLeft += right;
+  });
+
+  if (menu.id !== 'menu') return;
   var links = [].slice.call(menu.querySelectorAll('a'));
   var secs = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
   var current = -1;
@@ -23,7 +36,7 @@
       if (i === idx) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
     });
     var a = links[idx];
-    if (menu.scrollWidth > menu.clientWidth) {
+    if (menu.scrollWidth > menu.clientWidth && !menu.contains(document.activeElement)) {
       menu.scrollTo({ left: a ? a.offsetLeft - menu.offsetLeft - 16 : 0, behavior: 'smooth' });
     }
   }
