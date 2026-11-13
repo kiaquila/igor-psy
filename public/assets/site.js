@@ -18,12 +18,12 @@
   var secs = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
   var current = -1;
 
-  // высота шапки → CSS, чтобы блок занимал ровно остаток экрана
+  // Pass the header height to CSS so each section can fill the remaining viewport.
   function measure() {
     document.documentElement.style.setProperty('--hh', top.offsetHeight + 'px');
   }
 
-  // подсветка текущего раздела в шапке
+  // Highlight the current section in the header.
   function spy() {
     var line = top.getBoundingClientRect().bottom + innerHeight * 0.3;
     var idx = -1;

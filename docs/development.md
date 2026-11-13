@@ -1,53 +1,53 @@
-# Разработка и проверка pull request
+# Development and pull request checks
 
-## Работа с несколькими агентами
+## Working with multiple agents
 
-Начните задачу в Codex из корня доверенного проекта. Роли подхватываются из `.codex/agents/`. Пример запроса координатору.
+Start the Codex task from the root of the trusted project. Codex loads agent roles from `.codex/agents/`. You can give the coordinator a request like this.
 
-> Подготовь изменение по задаче. Передай реализацию site_implementer и назначь ему конкретные файлы. После интеграции параллельно запусти site_qa и site_reviewer на одном SHA. Исправь подтверждённые проблемы, повтори затронутые проверки и подготовь PR.
+> Implement the requested change. Delegate implementation to `site_implementer` and assign specific files. After integration, run `site_qa` and `site_reviewer` in parallel on the same SHA. Fix confirmed issues, rerun affected checks, and prepare the PR.
 
-Координатор проверяет итоговый diff, результаты тестов и оставшиеся ограничения. Локальный ревьюер проверяет diff до публикации, а нативный Codex проверяет опубликованный PR.
+The coordinator checks the final diff, test results, and any remaining limitations. The local reviewer checks the diff before publication, and the native Codex integration reviews the published PR.
 
-## Проверки
+## Checks
 
-| Проверка | Когда запускается | Что проверяет |
+| Check | When it runs | What it checks |
 | --- | --- | --- |
-| `Preflight` | PR в `main` и push в `main` | Обязательные файлы обвязки, страницы, якоря, ресурсы, запись в Telegram, статические маршруты, скорость загрузки по базовому замеру и тесты политики Codex Review. На GitHub также проверяет diff PR, сканирует `package-lock.json` через OSV и запускает Wrangler с `--dry-run`. |
-| `Codex Review` | PR в `main`, запрос ревью, комментарий бота или ручной запуск | Результат нативного Codex по текущему SHA и блокирующие замечания. |
+| `Preflight` | PRs targeting `main` and pushes to `main` | Required repository files, pages, anchors, assets, Telegram booking, static routes, estimated load times against the baseline, and Codex Review policy tests. On GitHub, it also checks the PR diff, scans `package-lock.json` with OSV, and runs Wrangler with `--dry-run`. |
+| `Codex Review` | PRs targeting `main`, review requests, bot comments, or manual runs | The native Codex result for the current SHA and any blocking findings. |
 
-Локальная команда использует Python 3.9+ и Node.js 22+.
+The local command requires Python 3.9+ and Node.js 22+.
 
 ```sh
 sh scripts/preflight.sh
 ```
 
-Для workflow можно дополнительно запустить `actionlint`. Для визуальных изменений укажите в PR, какие страницы и размеры окна проверили. Preflight проверяет файлы и ссылки локально. Для проверки браузерного поведения используйте локальный просмотр из README.
+You can also run `actionlint` to check workflows. For visual changes, record which pages and viewport sizes you checked in the PR. Preflight checks files and links locally. To verify browser behavior, follow the local preview steps in the README.
 
-## Базовый замер загрузки
+## Page load baseline
 
-Preflight сравнивает расчётное время до первой отрисовки и полной загрузки каждой страницы с `delivery-baseline.json`. Модель учитывает размер отдельных ответов (gzip для текста), скорость 1600 кбит/с, 150 мс на сетевой раунд и дополнительные раунды для ресурсов, обнаруженных в CSS. Она учитывает оба файла шрифтов, на которые ссылается CSS. Это воспроизводимая оценка для локальных ресурсов статического сайта. Замеры в браузере и на продакшене зависят от реальной сети.
+Preflight compares estimated time to first render and full load for each page with `delivery-baseline.json`. The model uses individual response sizes (gzip for text), a connection speed of 1,600 kbps, 150 ms per network round trip, and extra round trips for assets discovered in CSS. It includes both font files referenced by the CSS. This gives a reproducible estimate for local static assets. Browser and production measurements depend on the actual connection.
 
-Рост более чем на 3% проваливает Preflight. В выводе перечислены ресурсы, которые выросли. Если изменение нагрузки ожидаемо, обновите замер в том же PR, проверьте разницу и объясните её в описании PR.
+An increase of more than 3% fails Preflight. The output lists assets that grew. If you expect the increase, update the baseline in the same PR, check the diff, and explain it in the PR description.
 
 ```sh
 python3 scripts/check-site.py --update-delivery-baseline
 ```
 
-## Обновления зависимостей
+## Dependency updates
 
-Dependabot проверяет GitHub Actions и npm раз в неделю. Обновления minor и patch сгруппированы по экосистеме, major приходят отдельными PR. npm-дерево включает Wrangler и его транзитивные зависимости. OSV сканирует всё зафиксированное дерево, в том числе инструменты разработки.
+Dependabot checks GitHub Actions and npm weekly. It groups minor and patch updates by ecosystem and opens separate PRs for major updates. The npm dependency tree includes Wrangler and its transitive dependencies. OSV scans the full locked tree, including development tools.
 
-На PR от Dependabot действуют те же проверки. Владелец, участник или соавтор репозитория запрашивает Codex Review для текущего SHA.
+Dependabot PRs use the same checks. A repository owner, member, or collaborator requests Codex Review for the current SHA.
 
 ## Codex Review
 
-1. Возьмите полный SHA текущего PR командой `gh pr view <номер> --json headRefOid -q .headRefOid`.
-2. Оставьте отдельный комментарий `@codex review <полный SHA>` от владельца, участника или соавтора репозитория.
-3. Gate ждёт формальное одобрение или чистый ответ бота с указанием проверенного коммита. Доверенные ответы привязаны к последнему запросу на этот SHA. Реакция 👍 и уведомление о завершении сами по себе оставляют проверку красной.
-4. Исправьте P0–P2 и разберите открытые треды Codex, включая треды на устаревших строках. После push запросите ревью нового SHA. После закрытия тредов можно оставить `/codex-check` для повторной проверки уже опубликованных результатов.
+1. Get the full SHA of the current PR with `gh pr view <number> --json headRefOid -q .headRefOid`.
+2. Post `@codex review <full SHA>` as a standalone comment from a repository owner, member, or collaborator.
+3. The gate waits for a formal approval or a bot reply that identifies the reviewed commit and reports no findings. Trusted results must follow the latest request for that SHA. A thumbs-up reaction or a completion notification alone leaves the check failing.
+4. Fix P0–P2 findings and address open Codex threads, including threads on outdated lines. After pushing, request a review for the new SHA. After resolving threads, you can post `/codex-check` to recheck the existing results.
 
-Gate опрашивает GitHub до пяти минут. Создание и редактирование комментариев бота запускает повторную проверку. Если формальное ревью появилось позднее и без отдельного комментария, оставьте `/codex-check` или запустите **Codex review gate** в Actions с номером PR.
+The gate polls GitHub for up to five minutes. New or edited bot comments trigger another check. If a formal review arrives later without a separate comment, post `/codex-check` or run **Codex review gate** in Actions with the PR number.
 
-Workflow с правом записи Checks берёт код с `main` и публикует результат на SHA из GitHub API. Защита `main` требует успешных `Preflight` и `Codex Review` от GitHub Actions и актуальной базы PR.
+The workflow with write access to Checks runs code from `main` and publishes the result on the SHA returned by the GitHub API. Branch protection requires passing `Preflight` and `Codex Review` checks from GitHub Actions and an up-to-date PR base.
 
-Форматы нативного ответа взяты из [`kiaquila/ks`](https://github.com/kiaquila/ks/blob/main/docs/native-codex-receipts.md). Настройка интеграции и правила ревью описаны в [OpenAI Docs](https://learn.chatgpt.com/docs/third-party/github).
+The native response formats come from the [review receipts in `kiaquila/ks`](https://github.com/kiaquila/ks/blob/main/docs/native-codex-receipts.md). The integration setup and review rules are in the [OpenAI docs](https://learn.chatgpt.com/docs/third-party/github).
