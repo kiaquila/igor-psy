@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     permissions:
-      checks: write
+      statuses: write
       contents: read
       issues: read
       pull-requests: read
