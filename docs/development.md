@@ -54,4 +54,6 @@ The workflow with `statuses: write` runs code from `main` and publishes the resu
 
 During rollout, keep any existing `Codex Review` check on the same SHA passing: GitHub [requires both a check and a commit status](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks) if they share a required name. New PR heads use only the commit status. Do not work around an expected status by weakening branch protection or creating empty commits; inspect the status publication and rerun the trusted gate.
 
+Use the [GitHub regression procedure](codex-review-regression.md) to verify metadata edits and gate reruns on one unchanged PR head after deploying publisher changes.
+
 The native response formats come from the [review receipts in `kiaquila/ks`](https://github.com/kiaquila/ks/blob/main/docs/native-codex-receipts.md). The integration setup and review rules are in the [OpenAI docs](https://learn.chatgpt.com/docs/third-party/github).
