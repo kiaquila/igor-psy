@@ -25,6 +25,7 @@ REQUIRED = (
     "scripts/codex-review-policy.mjs",
     "scripts/preflight.sh",
     "tests/codex-review.test.mjs",
+    "tests/codex-review-gate.test.mjs",
     "tests/fixtures/native-codex-clean-replies.json",
     "wrangler.json",
 )

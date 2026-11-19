@@ -14,4 +14,4 @@ Static website for a private psychology practice. Pages and assets live in `publ
 
 - Verify the booking flow from `/`, `/practice/`, and `/404.html`. The link must open `@CherkasovPsy` with a prefilled message. Flag missing recipients, missing message text, and links that keyboard users cannot reach.
 - Preserve direct links to `/practice/` and its anchors, and preserve Cloudflare's 404 behavior. For markup changes, verify that navigation and the FAQ work with the keyboard.
-- Flag any weakening of the review gate that allows it to accept a review from an untrusted author or for a different SHA, or allows a workflow with write access to GitHub Checks to run PR code.
+- Flag any weakening of the review gate that allows it to accept a review from an untrusted author or for a different SHA, or allows a workflow with write access to GitHub Checks or commit statuses to run PR code.

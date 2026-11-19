@@ -13,7 +13,7 @@ The coordinator checks the final diff, test results, and any remaining limitatio
 | Check | When it runs | What it checks |
 | --- | --- | --- |
 | `Preflight` | PRs targeting `main` and pushes to `main` | Required repository files, pages, anchors, assets, Telegram booking, static routes, estimated load times against the baseline, and Codex Review policy tests. On GitHub, it also checks the PR diff, scans `package-lock.json` with OSV, and runs Wrangler with `--dry-run`. |
-| `Codex Review` | PRs targeting `main`, review requests, bot comments, or manual runs | The native Codex result for the current SHA and any blocking findings. |
+| `Codex Review` | PRs targeting `main`, review requests, bot comments, or manual runs | A commit status for the native Codex result on the current SHA and any blocking findings. |
 
 The local command requires Python 3.9+ and Node.js 22+.
 
@@ -48,6 +48,10 @@ Dependabot PRs use the same checks. A repository owner, member, or collaborator 
 
 The gate polls GitHub for up to five minutes. New or edited bot comments trigger another check. If a formal review arrives later without a separate comment, post `/codex-check` or run **Codex review gate** in Actions with the PR number.
 
-The workflow with write access to Checks runs code from `main` and publishes the result on the SHA returned by the GitHub API. Branch protection requires passing `Preflight` and `Codex Review` checks from GitHub Actions and an up-to-date PR base.
+The workflow with `statuses: write` runs code from `main` and publishes the result on the PR head SHA returned by the GitHub API. It first sets `Codex Review` to `pending`, then publishes `success` only after validating the review evidence. Missing or blocking evidence, changed PR state, and API errors cannot produce a successful status. Branch protection requires passing `Preflight` and `Codex Review` from GitHub Actions and an up-to-date PR base.
+
+`Codex Review` uses the commit Statuses API rather than creating a custom check run. GitHub assigns custom check runs to a check suite automatically. On PR #12, a metadata edit created a newer Actions suite, but subsequent custom review checks stayed in the original suite; protection reported the review check as expected despite its green result. A commit status is keyed by SHA and context, so metadata edits and `/codex-check` can refresh the required result without a new commit. Keep the GitHub Actions source requirement in branch protection. See [GitHub's Checks API guide](https://docs.github.com/en/rest/guides/using-the-rest-api-to-interact-with-checks) and [commit statuses API](https://docs.github.com/en/rest/commits/statuses).
+
+During rollout, keep any existing `Codex Review` check on the same SHA passing: GitHub [requires both a check and a commit status](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks) if they share a required name. New PR heads use only the commit status. Do not work around an expected status by weakening branch protection or creating empty commits; inspect the status publication and rerun the trusted gate.
 
 The native response formats come from the [review receipts in `kiaquila/ks`](https://github.com/kiaquila/ks/blob/main/docs/native-codex-receipts.md). The integration setup and review rules are in the [OpenAI docs](https://learn.chatgpt.com/docs/third-party/github).
