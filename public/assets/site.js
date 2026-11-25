@@ -1,4 +1,57 @@
 (function () {
+  var viewer = document.getElementById('document-viewer');
+  if (!viewer || typeof viewer.showModal !== 'function') return;
+  var image = viewer.querySelector('.document-image');
+  var status = viewer.querySelector('.document-status');
+  var opener;
+
+  image.addEventListener('load', function () {
+    image.hidden = false;
+    status.hidden = true;
+  });
+  image.addEventListener('error', function () {
+    image.hidden = true;
+    status.hidden = false;
+    status.textContent = 'Не удалось загрузить документ. Попробуйте ещё раз.';
+  });
+  document.querySelectorAll('.education-card').forEach(function (link) {
+    link.addEventListener('click', function (event) {
+      if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      opener = link;
+      image.alt = link.querySelector('img').alt;
+      image.width = Number(link.dataset.documentWidth);
+      image.height = Number(link.dataset.documentHeight);
+      image.style.setProperty('--document-width', link.dataset.documentWidth + 'px');
+      viewer.classList.remove('zoomed');
+      image.hidden = true;
+      status.hidden = false;
+      status.textContent = 'Загрузка документа…';
+      document.body.classList.add('document-open');
+      viewer.showModal();
+      image.src = link.href;
+    });
+  });
+  viewer.querySelector('.document-close').addEventListener('click', function () { viewer.close(); });
+  // Тап по документу увеличивает его до оригинального размера и обратно.
+  image.addEventListener('click', function () {
+    viewer.classList.toggle('zoomed');
+    viewer.scrollTop = viewer.scrollLeft = 0;
+  });
+  // Клик мимо документа тоже закрывает просмотр.
+  viewer.addEventListener('click', function (event) {
+    if (!event.target.closest('.document-image, .document-close')) viewer.close();
+  });
+  viewer.addEventListener('close', function () {
+    document.body.classList.remove('document-open');
+    image.removeAttribute('src');
+    image.hidden = true;
+    viewer.classList.remove('zoomed');
+    if (opener) opener.focus({ preventScroll: true });
+  });
+})();
+
+(function () {
   var root = document.documentElement;
   var top = document.querySelector('.top');
   var menu = top.querySelector('.menu');

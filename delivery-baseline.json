@@ -11,42 +11,47 @@
           "assets/igor-portrait.webp": 125792,
           "assets/manrope-cyrillic.woff2": 14544,
           "assets/manrope-latin.woff2": 24576,
-          "assets/site.css": 2640,
-          "index.html": 1160
+          "assets/site.css": 4369,
+          "index.html": 5516
         },
-        "ms": 1744
+        "ms": 1774
       },
       "fullLoad": {
         "bytes": {
-          "assets/favicon.svg": 171,
+          "assets/education/cbt-certificate-2020-preview.webp": 34744,
+          "assets/education/rggu-diploma-2007-preview.webp": 45650,
+          "assets/education/schema-therapy-certificate-2021-preview.webp": 14990,
+          "assets/favicon.svg": 347,
           "assets/igor-portrait.webp": 125792,
           "assets/manrope-cyrillic.woff2": 14544,
           "assets/manrope-latin.woff2": 24576,
-          "assets/site.css": 2640,
-          "index.html": 1160
+          "assets/site.css": 4369,
+          "assets/site.js": 1684,
+          "index.html": 5516
         },
-        "ms": 1744
+        "ms": 2261
       }
     },
     "/404.html": {
       "firstPaint": {
         "bytes": {
-          "404.html": 863,
+          "404.html": 1244,
           "assets/manrope-cyrillic.woff2": 14544,
           "assets/manrope-latin.woff2": 24576,
-          "assets/site.css": 2640
+          "assets/site.css": 4369
         },
-        "ms": 1113
+        "ms": 1124
       },
       "fullLoad": {
         "bytes": {
-          "404.html": 863,
-          "assets/favicon.svg": 171,
+          "404.html": 1244,
+          "assets/favicon.svg": 347,
           "assets/manrope-cyrillic.woff2": 14544,
           "assets/manrope-latin.woff2": 24576,
-          "assets/site.css": 2640
+          "assets/site.css": 4369,
+          "assets/site.js": 1684
         },
-        "ms": 1114
+        "ms": 1134
       }
     },
     "/practice/": {
@@ -54,20 +59,21 @@
         "bytes": {
           "assets/manrope-cyrillic.woff2": 14544,
           "assets/manrope-latin.woff2": 24576,
-          "assets/site.css": 2640,
-          "practice/index.html": 3686
+          "assets/site.css": 4369,
+          "practice/index.html": 1786
         },
-        "ms": 1127
+        "ms": 1126
       },
       "fullLoad": {
         "bytes": {
-          "assets/favicon.svg": 171,
+          "assets/favicon.svg": 347,
           "assets/manrope-cyrillic.woff2": 14544,
           "assets/manrope-latin.woff2": 24576,
-          "assets/site.css": 2640,
-          "practice/index.html": 3686
+          "assets/site.css": 4369,
+          "assets/site.js": 1684,
+          "practice/index.html": 1786
         },
-        "ms": 1128
+        "ms": 1137
       }
     }
   }
