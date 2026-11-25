@@ -2,15 +2,16 @@
   var viewer = document.getElementById('document-viewer');
   if (!viewer || typeof viewer.showModal !== 'function') return;
   var image = viewer.querySelector('.document-image');
+  var zoom = viewer.querySelector('.document-zoom');
   var status = viewer.querySelector('.document-status');
   var opener;
 
   image.addEventListener('load', function () {
-    image.hidden = false;
+    zoom.hidden = false;
     status.hidden = true;
   });
   image.addEventListener('error', function () {
-    image.hidden = true;
+    zoom.hidden = true;
     status.hidden = false;
     status.textContent = 'Не удалось загрузить документ. Попробуйте ещё раз.';
   });
@@ -24,7 +25,8 @@
       image.height = Number(link.dataset.documentHeight);
       image.style.setProperty('--document-width', link.dataset.documentWidth + 'px');
       viewer.classList.remove('zoomed');
-      image.hidden = true;
+      zoom.setAttribute('aria-pressed', 'false');
+      zoom.hidden = true;
       status.hidden = false;
       status.textContent = 'Загрузка документа…';
       document.body.classList.add('document-open');
@@ -33,19 +35,21 @@
     });
   });
   viewer.querySelector('.document-close').addEventListener('click', function () { viewer.close(); });
-  // Тап по документу увеличивает его до оригинального размера и обратно.
-  image.addEventListener('click', function () {
-    viewer.classList.toggle('zoomed');
+  // The native button supports taps, clicks, Enter and Space.
+  zoom.addEventListener('click', function () {
+    var zoomed = viewer.classList.toggle('zoomed');
+    zoom.setAttribute('aria-pressed', String(zoomed));
     viewer.scrollTop = viewer.scrollLeft = 0;
   });
   // Клик мимо документа тоже закрывает просмотр.
   viewer.addEventListener('click', function (event) {
-    if (!event.target.closest('.document-image, .document-close')) viewer.close();
+    if (!event.target.closest('.document-zoom, .document-close')) viewer.close();
   });
   viewer.addEventListener('close', function () {
     document.body.classList.remove('document-open');
     image.removeAttribute('src');
-    image.hidden = true;
+    zoom.hidden = true;
+    zoom.setAttribute('aria-pressed', 'false');
     viewer.classList.remove('zoomed');
     if (opener) opener.focus({ preventScroll: true });
   });
