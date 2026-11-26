@@ -1,7 +1,0 @@
-{
-  "tool_name": "mcp__ccd_turn__wrap_up",
-  "tool_input_preview": "{\"ask\":\"Закоммитить изменения?\",\"actions\":[{\"action\":\"commit\"},{\"label\":\"Пока нет\"}],\"recap\":\"На мобильных документ теперь вписывается целиком (object-fit: contain, 4/3, светлый фон вместо обрезки), ч...",
-  "error": "Not shown: commit does not hold right now (app actions available: none), so the app could not draw that button and would drop your question with it. The app lists commit only when it sees new edits to commit and the user has not kept passing it over, so do not ask for it in a reply or in your closing message: call wrap_up again without that action, and without the question if it asks to commit, or with the recap alone.",
-  "timestamp": "2026-11-26T14:25:21.763Z",
-  "retry_count": 1
-}
