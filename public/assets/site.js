@@ -5,6 +5,7 @@
   var zoom = viewer.querySelector('.document-zoom');
   var status = viewer.querySelector('.document-status');
   var opener;
+  var openerIsKeyboard = false;
 
   image.addEventListener('load', function () {
     zoom.hidden = false;
@@ -20,6 +21,8 @@
       if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
       opener = link;
+      // Pointer taps leave no focus ring behind, so only keyboard activation gets focus back.
+      openerIsKeyboard = event.detail === 0;
       image.alt = link.querySelector('img').alt;
       image.width = Number(link.dataset.documentWidth);
       image.height = Number(link.dataset.documentHeight);
@@ -51,7 +54,7 @@
     zoom.hidden = true;
     zoom.setAttribute('aria-pressed', 'false');
     viewer.classList.remove('zoomed');
-    if (opener) opener.focus({ preventScroll: true });
+    if (opener && openerIsKeyboard) opener.focus({ preventScroll: true });
   });
 })();
 
