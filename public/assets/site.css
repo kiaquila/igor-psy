@@ -108,7 +108,7 @@ h1 span{box-shadow:inset 0 -.4em 0 var(--hl);-webkit-box-decoration-break:clone;
 .education-copy h3{margin:0;font-size:17px;font-weight:700;line-height:1.35;text-wrap:balance}
 .education-institution,.education-meta{font-size:14px;line-height:1.5;color:var(--muted)}
 .education-institution{margin-top:8px}
-.education-meta{margin-top:2px}
+.education-place{font-weight:600;color:var(--ink)}
 
 /* Просмотр документа: только сам документ и крестик. */
 .document-viewer{width:100%;max-width:none;height:100%;max-height:none;margin:0;padding:16px;border:0;background:none;overflow:hidden}
